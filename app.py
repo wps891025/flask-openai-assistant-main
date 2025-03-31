@@ -17,7 +17,7 @@ def generate():
         messages=[
             {"role": "user", "content": prompt}
         ],
-        model="gpt-3.5-turbo-0125",
+        model="gpt-4o-mini-2024-07-18",
         temperature = 0.5,
     )
     generated_text = response['choices'][0]['message']['content'].strip()
