@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI App with OpenAI API</title>
+</head>
+
+<body data-new-gr-c-s-loaded="14.1229.0" spellcheck="false">
+    <form action="/generate" method="post" style="text-align: center;">
+        <ul>
+            <li style="text-align: center;"><span style="font-size: 48px;">Hi there 👋<br>How can I help you today?</span></li>
+        </ul><textarea name="prompt" placeholder="Enter your prompt" class="fr-rounded fr-large" style="height: 194px; width: 870px;"></textarea>
+        <p style="text-align: center;"><button type="submit">Generate</button></p>
+    </form>
+    <p><br></p>
+    <p>{% if response %}</p>
+      <textarea name="response" placeholder="Response"  {{ response }} class="fr-rounded fr-large" style="height: 194px; width: 870px;"></textarea>
+    <p>{% endif %}</p>
+</body>
+
+</html>
