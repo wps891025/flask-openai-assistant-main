@@ -8,7 +8,7 @@ openai.api_key = os.getenv('OPENAI_API_KEY')
 
 @app.route('/')
 def index():
-    return render_template('index2.html')
+    return render_template('index.html')
 
 @app.route('/generate', methods=['POST'])
 def generate():
@@ -21,7 +21,7 @@ def generate():
         temperature = 0.5,
     )
     generated_text = response['choices'][0]['message']['content'].strip()
-    return render_template('index2.html', response=generated_text)
+    return render_template('index.html', response=generated_text)
 
 if __name__ == '__main__':
     app.run(debug=True)
