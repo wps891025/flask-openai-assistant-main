@@ -12,17 +12,16 @@ def index():
 
 @app.route('/generate', methods=['POST'])
 def generate():
-    data = request.get_json()  # 取得 JSON 格式的請求資料
-    prompt = data.get('prompt', '')  # 獲取 prompt 內容
-
+    prompt = request.form['prompt']
     response = openai.ChatCompletion.create(
-        messages=[{"role": "user", "content": prompt}],
+        messages=[
+            {"role": "user", "content": prompt}
+        ],
         model="gpt-4o-mini-2024-07-18",
-        temperature=0.5,
+        temperature = 0.5,
     )
-
     generated_text = response['choices'][0]['message']['content'].strip()
-    return jsonify({"response": generated_text})  # 回傳 JSON 格式的回應
+    return render_template('index.html', response=generated_text) 
 
 if __name__ == '__main__':
     app.run(debug=True)
