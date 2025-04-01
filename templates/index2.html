@@ -140,13 +140,11 @@
     <h1>向AI求助</h1>
     <form action="/generate" method="post">
         <textarea name="prompt" placeholder="Enter your prompt"></textarea>
-        <button type="submit">Generate</button>
+        <button onclick="askGPT()" type="submit">提問</button>
     </form>
-    {% if response %}
-    <div>
-        <p>{{ response }}</p>
+    <div id="AIresponse">
+
     </div>
-    {% endif %}
     <script>
         var piece = [{
             id: 1,
@@ -3093,6 +3091,20 @@
             } else if (redCount == 16) {
                 alert("黑方獲勝");
             }
+        }
+
+        async function askGPT() {
+            const prompt = document.getElementById("prompt").value;
+            const responseDiv = document.getElementById("AIresponse");
+
+            const response = await fetch("/generate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt })
+            });
+
+            const data = await response.json();
+            responseDiv.innerText = data.response;
         }
     </script>
 </body>
