@@ -2,22 +2,3099 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI App with OpenAI API</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>網路雲端運算作業</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-direction: column;
+            background-color: #fff2ba;
+        }
+
+        .head {
+            font-size: 48px;
+            font-weight: bold;
+        }
+
+        .content {
+            padding-top: 30px;
+            width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            flex-wrap: nowrap;
+            align-items: flex-start;
+        }
+
+        .footer {
+            padding-top: 30px;
+        }
+
+        #blackPlayer {
+            font-size: 35px;
+            font-weight: bold;
+        }
+
+        #redPlayer {
+            font-size: 35px;
+            font-weight: bold;
+            color: #de2500;
+        }
+
+        table {
+            border: 2px solid #000;
+            text-align: center;
+            border-collapse: collapse;
+            background-color: #ffb061;
+        }
+
+        td {
+            border: 2px solid #000;
+            height: 175px;
+            width: 175px;
+        }
+
+        .pice {
+            height: 140px;
+            width: 140px;
+            border-radius: 70px;
+            background-color: #c7ffd6;
+            font-size: 0px;
+            line-height: 0;
+            overflow: hidden;
+        }
+
+        .blackPice {
+            height: 140px;
+            width: 140px;
+            border-radius: 70px;
+            background-color: white;
+            border-width: 1px;
+            border-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: black;
+            font-size: 85px;
+        }
+
+        .redPice {
+            height: 140px;
+            width: 140px;
+            border-radius: 70px;
+            border-width: 1px;
+            border-color: #000;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: red;
+            font-size: 85px;
+        }
+
+        .movePoint {
+            height: 90px;
+            width: 90px;
+            border-radius: 50px;
+            background-color: #fff173;
+            position: absolute;
+            opacity: 0.8;
+            display: none;
+            border: 0px;
+        }
+
+        .tdContent {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #restart {
+            height: 80px;
+            width: 150px;
+            background-color: #ffbaba;
+            border-width: 0px;
+            font-size: 34px;
+            color: red;
+        }
+    </style>
 </head>
 
-<body data-new-gr-c-s-loaded="14.1229.0" spellcheck="false">
-    <form action="/generate" method="post" style="text-align: center;">
-        <ul>
-            <li style="text-align: center;"><span style="font-size: 48px;">Hi there 👋<br>How can I help you today?</span></li>
-        </ul><textarea name="prompt" placeholder="Enter your prompt" class="fr-rounded fr-large" style="height: 194px; width: 870px;"></textarea>
-        <p style="text-align: center;"><button type="submit">Generate</button></p>
+<body>
+    <div class="head">
+        暗棋
+    </div>
+    <div class="content">
+        <!-- <div id="blackPlayer">黑方</div> -->
+        <div id="checkerboard"></div>
+        <!-- <div id="redPlayer">紅方</div> -->
+    </div>
+    <div class="footer">
+        <button id="restart" onclick="restart()">重新開始</button>
+    </div>
+    <form action="/generate" method="post">
+        <h3>向AI求助</h3>
+        <textarea name="prompt" placeholder="Enter your prompt"></textarea>
+        <button type="submit">Generate</button>
     </form>
-    <p><br></p>
-    <p>{% if response %}</p>
-      <textarea name="response" placeholder="Response"  {{ response }} class="fr-rounded fr-large" style="height: 194px; width: 870px;"></textarea>
-    <p>{% endif %}</p>
+    {% if response %}
+    <div>
+        <p>{{ response }}</p>
+    </div>
+    {% endif %}
+    <script>
+        var piece = [{
+            id: 1,
+            level: 7,
+            name: "將",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 2,
+            level: 7,
+            name: "帥",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 3,
+            level: 6,
+            name: "士",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 4,
+            level: 6,
+            name: "仕",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 5,
+            level: 6,
+            name: "士",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 6,
+            level: 6,
+            name: "仕",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 7,
+            level: 5,
+            name: "象",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 8,
+            level: 5,
+            name: "相",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 9,
+            level: 5,
+            name: "象",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 10,
+            level: 5,
+            name: "相",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 11,
+            level: 4,
+            name: "車",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 12,
+            level: 4,
+            name: "俥",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 13,
+            level: 4,
+            name: "車",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 14,
+            level: 4,
+            name: "俥",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 15,
+            level: 3,
+            name: "馬",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 16,
+            level: 3,
+            name: "傌",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 17,
+            level: 3,
+            name: "馬",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 18,
+            level: 3,
+            name: "傌",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 19,
+            level: 2,
+            name: "砲",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 20,
+            level: 2,
+            name: "炮",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 21,
+            level: 2,
+            name: "砲",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 22,
+            level: 2,
+            name: "炮",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 23,
+            level: 1,
+            name: "卒",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 24,
+            level: 1,
+            name: "兵",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 25,
+            level: 1,
+            name: "卒",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 26,
+            level: 1,
+            name: "兵",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 27,
+            level: 1,
+            name: "卒",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+
+        {
+            id: 28,
+            level: 1,
+            name: "兵",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 29,
+            level: 1,
+            name: "卒",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 30,
+            level: 1,
+            name: "兵",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 31,
+            level: 1,
+            name: "卒",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        {
+            id: 32,
+            level: 1,
+            name: "兵",
+            corver: true,
+            eat: false,
+            move: false,
+        },
+        ];
+        let table = "";
+        var newArr = [];
+        var show = false;
+        var point;
+        var copeArr = [];
+        for (let i = piece.length - 1; i > 0; i--) {
+            let j = Math.floor(Math.random() * (i + 1));
+            [piece[i], piece[j]] = [piece[j], piece[i]];
+        }
+        copeArr = JSON.parse(JSON.stringify(piece));
+        newArr = transArr(piece);
+        showCheckerboard();
+
+        function restart() {
+            for (let i = 0; i < piece.length; i++) {
+                piece[i].eat = false;
+                piece[i].corver = true;
+            }
+            for (let i = piece.length - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
+                [piece[i], piece[j]] = [piece[j], piece[i]];
+            }
+            copeArr = JSON.parse(JSON.stringify(piece));
+            newArr = transArr(copeArr);
+            showCheckerboard();
+        }
+
+        function transArr(arr) {
+            //洗棋
+            let newArr = [];
+
+            for (let i = 0, j = 0; i < copeArr.length; j++) {
+                newArr[j] = copeArr.splice(0, 8);
+            }
+            return newArr;
+        }
+
+        function showCheckerboard() {
+            var checkerboard = document.querySelector("#checkerboard");
+            checkerboard.innerHTML = "";
+            table = `<table>`;
+            for (let row = 0; row < 4; row++) {
+                table += `<tr>`;
+                for (let column = 0; column < 8; column++) {
+                    if (newArr[row][column].eat == true) {
+                        table += `<td>
+                    <div class="tdContent" id="p${newArr[row][column].id}">
+                      <div class="pice"  style="  display: none;" onclick="pice(${newArr[row][column].id})">${newArr[row][column].name}</div>
+                      <button class="movePoint"  onclick="moveCheck(${newArr[row][column].id})" ></button>
+                    </div>
+                  </td>`;
+                    } else if (newArr[row][column].corver == true) {
+                        table += `<td>
+                    <div class="tdContent" id="p${newArr[row][column].id}">
+                      <div class="pice"  onclick="pice(${newArr[row][column].id})">${newArr[row][column].name}</div>
+                      <button class="movePoint"  onclick="moveCheck(${newArr[row][column].id})" ></button>
+                    </div>
+                  </td>`;
+                    } else {
+                        if (newArr[row][column].id % 2 !== 0) {
+                            //黑棋
+                            table += `<td>
+                    <div class="tdContent" id="p${newArr[row][column].id}">
+                      <div class="blackPice"  onclick="pice(${newArr[row][column].id})">${newArr[row][column].name}</div>
+                      <button class="movePoint"  onclick="moveCheck(${newArr[row][column].id})" ></button>
+                    </div>
+                  </td>`;
+                        } else {
+                            //紅棋
+                            table += `<td>
+                    <div class="tdContent" id="p${newArr[row][column].id}">
+                      <div class="redPice"  onclick="pice(${newArr[row][column].id})">${newArr[row][column].name}</div>
+                      <button class="movePoint"  onclick="moveCheck(${newArr[row][column].id})" ></button>
+                    </div>
+                  </td>`;
+                        }
+                    }
+                }
+            }
+            table += `</tr>`;
+            table += `</table>`;
+            checkerboard.innerHTML = table;
+        }
+
+        function pice(id) {
+            //翻棋
+            let ifMove = document
+                .querySelector("#p" + id + ">div")
+                .getAttribute("class");
+
+            var piceChange = piece.findIndex((res) => res.id === id);
+
+            let x = Math.floor(piceChange / 8);
+            let y = piceChange % 8;
+            if (newArr[x][y].corver == true) {
+                newArr[x][y].corver = false;
+                showCheckerboard();
+            } else {
+                if (ifMove == "blackPice" || ifMove == "redPice") {
+                    move(id);
+                }
+            }
+        }
+
+        function move(id) {
+            //顯示可以走的點
+            show = !show;
+            var display = "block";
+            if (show) {
+                display = "block";
+            } else {
+                display = "none";
+            }
+            let test = piece
+                .map((res) => {
+                    return res.id;
+                })
+                .indexOf(id);
+            let x = Math.floor(test / 8);
+            let y = test % 8;
+
+            if (x == 0 && y == 0) {
+                //左上
+                let bottomID = newArr[x + 1][y].id;
+                let rightID = newArr[x][y + 1].id;
+
+                console.log('可以吃的棋')
+
+                let bottom = document.querySelector("#p" + bottomID + ">div");
+                let right = document.querySelector("#p" + rightID + ">div");
+                let moveButtonBottom = document.querySelector(
+                    "#p" + bottomID + ">button"
+                );
+                let moveButtonRight = document.querySelector(
+                    "#p" + rightID + ">button"
+                );
+
+                if (newArr[x + 1][y].eat == true && newArr[x][y].name == '炮') { //下
+                    moveButtonBottom.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x + 1; i <= 3; i++) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x + 1][y].eat == true && newArr[x][y].name == '砲') {
+                    moveButtonBottom.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x + 1; i <= 3; i++) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x + 1][y].eat == true) {
+                    //下
+                    moveButtonBottom.style.display = display;
+                    console.log(newArr[x + 1][y].name); //下
+                } else if (newArr[x][y].name == '炮') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x + 1; i <= 3; i++) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y].name == '砲') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x + 1; i <= 3; i++) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else {
+                    if (newArr[x][y].name == "兵" && bottomID == 1 && bottom.getAttribute("class") !== "pice") {
+                        moveButtonBottom.style.display = display;
+                    }
+                    if (newArr[x][y].name == "卒" && bottomID == 2 && bottom.getAttribute("class") !== "pice") {
+                        moveButtonBottom.style.display = display;
+                    }
+                    if (
+                        bottom.getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== bottomID % 2 &&
+                        newArr[x][y].level >= newArr[x + 1][y].level
+                    ) {
+                        moveButtonBottom.style.display = display;
+                        console.log(newArr[x + 1][y].name); //下
+                    }
+                    if (newArr[x][y].id == 1 && newArr[x + 1][y].name == '兵') {
+                        moveButtonBottom.style.display = "none";
+                    }
+                    if (newArr[x][y].id == 2 && newArr[x + 1][y].name == '卒') {
+                        moveButtonBottom.style.display = "none";
+                    }
+                }
+
+                if (newArr[x][y + 1].eat == true && newArr[x][y].name == '炮') { //右
+                    moveButtonRight.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y + 1; i <= 7; i++) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y + 1].eat == true && newArr[x][y].name == '砲') {
+                    moveButtonRight.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y + 1; i <= 7; i++) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y + 1].eat == true) {
+                    //右
+                    moveButtonRight.style.display = display;
+                    console.log(newArr[x][y + 1].name); //右
+                } else if (newArr[x][y].name == '炮') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y + 1; i <= 7; i++) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y].name == '砲') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y + 1; i <= 7; i++) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else {
+                    if (newArr[x][y].name == "兵" && rightID == 1 && right.getAttribute("class") !== "pice") {
+                        moveButtonRight.style.display = display;
+                    }
+                    if (newArr[x][y].name == "卒" && rightID == 2 && right.getAttribute("class") !== "pice") {
+                        moveButtonRight.style.display = display;
+                    }
+                    if (
+                        right.getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== rightID % 2 &&
+                        newArr[x][y].level >= newArr[x][y + 1].level
+                    ) {
+                        moveButtonRight.style.display = display;
+                        console.log(newArr[x][y + 1].name); //右
+                    }
+                    if (newArr[x][y].id == 1 && newArr[x][y + 1].name == '兵') {
+                        moveButtonRight.style.display = "none";
+                    }
+                    if (newArr[x][y].id == 2 && newArr[x][y + 1].name == '卒') {
+                        moveButtonRight.style.display = "none";
+                    }
+                }
+                point = id;
+            } else if (x == 0 && y == 7) {
+                //右上
+                let leftID = newArr[x][y - 1].id;
+                let bottomID = newArr[x + 1][y].id;
+
+                let bottom = document.querySelector("#p" + bottomID + ">div");
+                let left = document.querySelector("#p" + leftID + ">div");
+
+                console.log("可以吃的棋");
+                let moveButtonLeft = document.querySelector(
+                    "#p" + leftID + ">button"
+                );
+                let moveButtonBottom = document.querySelector(
+                    "#p" + bottomID + ">button"
+                );
+
+                if (newArr[x + 1][y].eat == true && newArr[x][y].name == '炮') { //下
+                    moveButtonBottom.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x + 1; i <= 3; i++) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x + 1][y].eat == true && newArr[x][y].name == '砲') {
+                    moveButtonBottom.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x + 1; i <= 3; i++) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x + 1][y].eat == true) {
+                    //下
+                    moveButtonBottom.style.display = display;
+                    console.log(newArr[x + 1][y].name); //下
+                } else if (newArr[x][y].name == '炮') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x + 1; i <= 3; i++) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y].name == '砲') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x + 1; i <= 3; i++) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else {
+                    if (newArr[x][y].name == "兵" && bottomID == 1 && bottom.getAttribute("class") !== "pice") {
+                        moveButtonBottom.style.display = display;
+                    }
+                    if (newArr[x][y].name == "卒" && bottomID == 2 && bottom.getAttribute("class") !== "pice") {
+                        moveButtonBottom.style.display = display;
+                    }
+                    if (
+                        bottom.getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== bottomID % 2 &&
+                        newArr[x][y].level >= newArr[x + 1][y].level
+                    ) {
+                        moveButtonBottom.style.display = display;
+                        console.log(newArr[x + 1][y].name); //下
+                    }
+                    if (newArr[x][y].id == 1 && newArr[x + 1][y].name == '兵') {
+                        moveButtonBottom.style.display = "none";
+                    }
+                    if (newArr[x][y].id == 2 && newArr[x + 1][y].name == '卒') {
+                        moveButtonBottom.style.display = "none";
+                    }
+                }
+
+                if (newArr[x][y - 1].eat == true && newArr[x][y].name == '炮') { //左
+                    moveButtonLeft.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y - 1; i >= 0; i--) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y - 1].eat == true && newArr[x][y].name == '砲') {
+                    moveButtonLeft.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y - 1; i >= 0; i--) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y - 1].eat == true) {
+                    //左
+                    moveButtonLeft.style.display = display;
+                    console.log(newArr[x][y - 1].name); //左
+                } else if (newArr[x][y].name == '炮') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y - 1; i >= 0; i--) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y].name == '砲') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y - 1; i >= 0; i--) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else {
+                    if (newArr[x][y].name == "兵" && leftID == 1 && left.getAttribute("class") !== "pice") {
+                        moveButtonLeft.style.display = display;
+                    }
+                    if (newArr[x][y].name == "卒" && leftID == 2 && left.getAttribute("class") !== "pice") {
+                        moveButtonLeft.style.display = display;
+                    }
+                    if (
+                        left.getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== leftID % 2 &&
+                        newArr[x][y].level >= newArr[x][y - 1].level
+                    ) {
+                        moveButtonLeft.style.display = display;
+                        console.log(newArr[x][y - 1].name); //左
+                    }
+                    if (newArr[x][y].id == 1 && newArr[x][y - 1].name == '兵') {
+                        moveButtonLeft.style.display = "none";
+                    }
+                    if (newArr[x][y].id == 2 && newArr[x][y - 1].name == '卒') {
+                        moveButtonLeft.style.display = "none";
+                    }
+                }
+                point = id;
+            } else if (x == 3 && y == 0) {
+                //左下
+                let rightID = newArr[x][y + 1].id;
+                let topID = newArr[x - 1][y].id;
+
+                console.log("可以吃的棋");
+                console.log(newArr[x - 1][y].name);
+                console.log(newArr[x][y + 1].name);
+
+                let top = document.querySelector("#p" + topID + ">div");
+                let right = document.querySelector("#p" + rightID + ">div");
+
+                let moveButtonRight = document.querySelector(
+                    "#p" + rightID + ">button"
+                );
+                let moveButtonTop = document.querySelector("#p" + topID + ">button");
+
+
+                if (newArr[x - 1][y].eat == true && newArr[x][y].name == '炮') { //上
+                    moveButtonTop.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x - 1; i >= 0; i--) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x - 1][y].eat == true && newArr[x][y].name == '砲') {
+                    moveButtonTop.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x - 1; i >= 0; i--) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x - 1][y].eat == true) {
+                    //上
+                    moveButtonTop.style.display = display;
+                    console.log(newArr[x - 1][y].name); //上
+                } else if (newArr[x][y].name == '炮') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x - 1; i >= 0; i--) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y].name == '砲') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x - 1; i >= 0; i--) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else {
+                    if (newArr[x][y].name == "兵" && topID == 1 && top.getAttribute("class") !== "pice") {
+                        moveButtonTop.style.display = display;
+                    }
+                    if (newArr[x][y].name == "卒" && topID == 2 && top.getAttribute("class") !== "pice") {
+                        moveButtonTop.style.display = display;
+                    }
+                    if (
+                        top.getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== topID % 2 &&
+                        newArr[x][y].level >= newArr[x - 1][y].level
+                    ) {
+                        moveButtonTop.style.display = display;
+                        console.log(newArr[x - 1][y].name); //上
+                    }
+                    if (newArr[x][y].id == 1 && newArr[x - 1][y].name == '兵') {
+                        moveButtonTop.style.display = "none";
+                    }
+                    if (newArr[x][y].id == 2 && newArr[x - 1][y].name == '卒') {
+                        moveButtonTop.style.display = "none";
+                    }
+                }
+
+                if (newArr[x][y + 1].eat == true && newArr[x][y].name == '炮') { //右
+                    moveButtonRight.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y + 1; i <= 7; i++) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y + 1].eat == true && newArr[x][y].name == '砲') {
+                    moveButtonRight.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y + 1; i <= 7; i++) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y + 1].eat == true) {
+                    //右
+                    moveButtonRight.style.display = display;
+                    console.log(newArr[x][y + 1].name); //右
+                } else if (newArr[x][y].name == '炮') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y + 1; i <= 7; i++) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y].name == '砲') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y + 1; i <= 7; i++) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else {
+                    if (newArr[x][y].name == "兵" && rightID == 1 && right.getAttribute("class") !== "pice") {
+                        moveButtonRight.style.display = display;
+                    }
+                    if (newArr[x][y].name == "卒" && rightID == 2 && right.getAttribute("class") !== "pice") {
+                        moveButtonRight.style.display = display;
+                    }
+                    if (
+                        right.getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== rightID % 2 &&
+                        newArr[x][y].level >= newArr[x][y + 1].level
+                    ) {
+                        moveButtonRight.style.display = display;
+                        console.log(newArr[x][y + 1].name); //右
+                    }
+                    if (newArr[x][y].id == 1 && newArr[x][y + 1].name == '兵') {
+                        moveButtonRight.style.display = "none";
+                    }
+                    if (newArr[x][y].id == 2 && newArr[x][y + 1].name == '卒') {
+                        moveButtonRight.style.display = "none";
+                    }
+                }
+                point = id;
+            } else if (x == 3 && y == 7) {
+                //右下
+                let leftID = newArr[x][y - 1].id;
+                let topID = newArr[x - 1][y].id;
+
+                console.log("可以吃的棋");
+
+                let top = document.querySelector("#p" + topID + ">div");
+                let left = document.querySelector("#p" + leftID + ">div");
+
+                let moveButtonLeft = document.querySelector(
+                    "#p" + leftID + ">button"
+                );
+                let moveButtonTop = document.querySelector("#p" + topID + ">button");
+
+
+                if (newArr[x - 1][y].eat == true && newArr[x][y].name == '炮') { //上
+                    moveButtonTop.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x - 1; i >= 0; i--) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x - 1][y].eat == true && newArr[x][y].name == '砲') {
+                    moveButtonTop.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x - 1; i >= 0; i--) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x - 1][y].eat == true) {
+                    //上
+                    moveButtonTop.style.display = display;
+                    console.log(newArr[x - 1][y].name); //上
+                } else if (newArr[x][y].name == '炮') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x - 1; i >= 0; i--) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y].name == '砲') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x - 1; i >= 0; i--) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else {
+                    if (newArr[x][y].name == "兵" && topID == 1 && top.getAttribute("class") !== "pice") {
+                        moveButtonTop.style.display = display;
+                    }
+                    if (newArr[x][y].name == "卒" && topID == 2 && top.getAttribute("class") !== "pice") {
+                        moveButtonTop.style.display = display;
+                    }
+                    if (
+                        top.getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== topID % 2 &&
+                        newArr[x][y].level >= newArr[x - 1][y].level
+                    ) {
+                        moveButtonTop.style.display = display;
+                        console.log(newArr[x - 1][y].name); //上
+                    }
+                    if (newArr[x][y].id == 1 && newArr[x - 1][y].name == '兵') {
+                        moveButtonTop.style.display = "none";
+                    }
+                    if (newArr[x][y].id == 2 && newArr[x - 1][y].name == '卒') {
+                        moveButtonTop.style.display = "none";
+                    }
+                }
+
+
+                if (newArr[x][y - 1].eat == true && newArr[x][y].name == '炮') { //左
+                    moveButtonLeft.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y - 1; i >= 0; i--) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y - 1].eat == true && newArr[x][y].name == '砲') {
+                    moveButtonLeft.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y - 1; i >= 0; i--) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y - 1].eat == true) {
+                    //左
+                    moveButtonLeft.style.display = display;
+                    console.log(newArr[x][y - 1].name); //左
+                } else if (newArr[x][y].name == '炮') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y - 1; i >= 0; i--) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y].name == '砲') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y - 1; i >= 0; i--) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else {
+                    if (newArr[x][y].name == "兵" && leftID == 1 && left.getAttribute("class") !== "pice") {
+                        moveButtonLeft.style.display = display;
+                    }
+                    if (newArr[x][y].name == "卒" && leftID == 2 && left.getAttribute("class") !== "pice") {
+                        moveButtonLeft.style.display = display;
+                    }
+                    if (
+                        left.getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== leftID % 2 &&
+                        newArr[x][y].level >= newArr[x][y - 1].level
+                    ) {
+                        moveButtonLeft.style.display = display;
+                        console.log(newArr[x][y - 1].name); //左
+                    }
+                    if (newArr[x][y].id == 1 && newArr[x][y - 1].name == '兵') {
+                        moveButtonLeft.style.display = "none";
+                    }
+                    if (newArr[x][y].id == 2 && newArr[x][y - 1].name == '卒') {
+                        moveButtonLeft.style.display = "none";
+                    }
+                }
+                point = id;
+            } else if (x == 0) {
+                //最上邊
+                let rightID = newArr[x][y + 1].id;
+                let leftID = newArr[x][y - 1].id;
+                let bottomID = newArr[x + 1][y].id;
+
+                console.log("可以吃的棋");
+
+                let bottom = document.querySelector("#p" + bottomID + ">div");
+                let right = document.querySelector("#p" + rightID + ">div");
+                let left = document.querySelector("#p" + leftID + ">div");
+
+                let moveButtonRight = document.querySelector(
+                    "#p" + rightID + ">button"
+                );
+                let moveButtonLeft = document.querySelector(
+                    "#p" + leftID + ">button"
+                );
+                let moveButtonBottom = document.querySelector(
+                    "#p" + bottomID + ">button"
+                );
+
+                if (newArr[x + 1][y].eat == true && newArr[x][y].name == '炮') { //下
+                    moveButtonBottom.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x + 1; i <= 3; i++) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x + 1][y].eat == true && newArr[x][y].name == '砲') {
+                    moveButtonBottom.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x + 1; i <= 3; i++) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x + 1][y].eat == true) {
+                    //下
+                    moveButtonBottom.style.display = display;
+                    console.log(newArr[x + 1][y].name); //下
+                } else if (newArr[x][y].name == '炮') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x + 1; i <= 3; i++) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y].name == '砲') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x + 1; i <= 3; i++) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else {
+                    if (newArr[x][y].name == "兵" && bottomID == 1 && bottom.getAttribute("class") !== "pice") {
+                        moveButtonBottom.style.display = display;
+                    }
+                    if (newArr[x][y].name == "卒" && bottomID == 2 && bottom.getAttribute("class") !== "pice") {
+                        moveButtonBottom.style.display = display;
+                    }
+                    if (
+                        bottom.getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== bottomID % 2 &&
+                        newArr[x][y].level >= newArr[x + 1][y].level
+                    ) {
+                        moveButtonBottom.style.display = display;
+                        console.log(newArr[x + 1][y].name); //下
+                    }
+                    if (newArr[x][y].id == 1 && newArr[x + 1][y].name == '兵') {
+                        moveButtonBottom.style.display = "none";
+                    }
+                    if (newArr[x][y].id == 2 && newArr[x + 1][y].name == '卒') {
+                        moveButtonBottom.style.display = "none";
+                    }
+                }
+
+                if (newArr[x][y - 1].eat == true && newArr[x][y].name == '炮') { //左
+                    moveButtonLeft.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y - 1; i >= 0; i--) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y - 1].eat == true && newArr[x][y].name == '砲') {
+                    moveButtonLeft.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y - 1; i >= 0; i--) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y - 1].eat == true) {
+                    //左
+                    moveButtonLeft.style.display = display;
+                    console.log(newArr[x][y - 1].name); //左
+                } else if (newArr[x][y].name == '炮') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y - 1; i >= 0; i--) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y].name == '砲') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y - 1; i >= 0; i--) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else {
+                    if (newArr[x][y].name == "兵" && leftID == 1 && left.getAttribute("class") !== "pice") {
+                        moveButtonLeft.style.display = display;
+                    }
+                    if (newArr[x][y].name == "卒" && leftID == 2 && left.getAttribute("class") !== "pice") {
+                        moveButtonLeft.style.display = display;
+                    }
+                    if (
+                        left.getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== leftID % 2 &&
+                        newArr[x][y].level >= newArr[x][y - 1].level
+                    ) {
+                        moveButtonLeft.style.display = display;
+                        console.log(newArr[x][y - 1].name); //左
+                    }
+                    if (newArr[x][y].id == 1 && newArr[x][y - 1].name == '兵') {
+                        moveButtonLeft.style.display = "none";
+                    }
+                    if (newArr[x][y].id == 2 && newArr[x][y - 1].name == '卒') {
+                        moveButtonLeft.style.display = "none";
+                    }
+                }
+
+                if (newArr[x][y + 1].eat == true && newArr[x][y].name == '炮') { //右
+                    moveButtonRight.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y + 1; i <= 7; i++) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y + 1].eat == true && newArr[x][y].name == '砲') {
+                    moveButtonRight.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y + 1; i <= 7; i++) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y + 1].eat == true) {
+                    //右
+                    moveButtonRight.style.display = display;
+                    console.log(newArr[x][y + 1].name); //右
+                } else if (newArr[x][y].name == '炮') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y + 1; i <= 7; i++) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y].name == '砲') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y + 1; i <= 7; i++) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else {
+                    if (newArr[x][y].name == "兵" && rightID == 1 && right.getAttribute("class") !== "pice") {
+                        moveButtonRight.style.display = display;
+                    }
+                    if (newArr[x][y].name == "卒" && rightID == 2 && right.getAttribute("class") !== "pice") {
+                        moveButtonRight.style.display = display;
+                    }
+                    if (
+                        right.getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== rightID % 2 &&
+                        newArr[x][y].level >= newArr[x][y + 1].level
+                    ) {
+                        moveButtonRight.style.display = display;
+                        console.log(newArr[x][y + 1].name); //右
+                    }
+                    if (newArr[x][y].id == 1 && newArr[x][y + 1].name == '兵') {
+                        moveButtonRight.style.display = "none";
+                    }
+                    if (newArr[x][y].id == 2 && newArr[x][y + 1].name == '卒') {
+                        moveButtonRight.style.display = "none";
+                    }
+                }
+
+                point = id;
+            } else if (x == 3) {
+                //最下邊
+                let rightID = newArr[x][y + 1].id;
+                let leftID = newArr[x][y - 1].id;
+                let topID = newArr[x - 1][y].id;
+
+                console.log("可以吃的棋");
+
+                let top = document.querySelector("#p" + topID + ">div");
+                let right = document.querySelector("#p" + rightID + ">div");
+                let left = document.querySelector("#p" + leftID + ">div");
+
+                let moveButtonRight = document.querySelector(
+                    "#p" + rightID + ">button"
+                );
+                let moveButtonLeft = document.querySelector(
+                    "#p" + leftID + ">button"
+                );
+                let moveButtonTop = document.querySelector("#p" + topID + ">button");
+
+                if (newArr[x - 1][y].eat == true && newArr[x][y].name == '炮') { //上
+                    moveButtonTop.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x - 1; i >= 0; i--) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x - 1][y].eat == true && newArr[x][y].name == '砲') {
+                    moveButtonTop.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x - 1; i >= 0; i--) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x - 1][y].eat == true) {
+                    //上
+                    moveButtonTop.style.display = display;
+                    console.log(newArr[x - 1][y].name); //上
+                } else if (newArr[x][y].name == '炮') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x - 1; i >= 0; i--) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y].name == '砲') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x - 1; i >= 0; i--) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else {
+                    if (newArr[x][y].name == "兵" && topID == 1 && top.getAttribute("class") !== "pice") {
+                        moveButtonTop.style.display = display;
+                    }
+                    if (newArr[x][y].name == "卒" && topID == 2 && top.getAttribute("class") !== "pice") {
+                        moveButtonTop.style.display = display;
+                    }
+                    if (
+                        top.getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== topID % 2 &&
+                        newArr[x][y].level >= newArr[x - 1][y].level
+                    ) {
+                        moveButtonTop.style.display = display;
+                        console.log(newArr[x - 1][y].name); //上
+                    }
+                    if (newArr[x][y].id == 1 && newArr[x - 1][y].name == '兵') {
+                        moveButtonTop.style.display = "none";
+                    }
+                    if (newArr[x][y].id == 2 && newArr[x - 1][y].name == '卒') {
+                        moveButtonTop.style.display = "none";
+                    }
+                }
+
+                if (newArr[x][y - 1].eat == true && newArr[x][y].name == '炮') { //左
+                    moveButtonLeft.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y - 1; i >= 0; i--) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y - 1].eat == true && newArr[x][y].name == '砲') {
+                    moveButtonLeft.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y - 1; i >= 0; i--) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y - 1].eat == true) {
+                    //左
+                    moveButtonLeft.style.display = display;
+                    console.log(newArr[x][y - 1].name); //左
+                } else if (newArr[x][y].name == '炮') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y - 1; i >= 0; i--) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y].name == '砲') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y - 1; i >= 0; i--) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else {
+                    if (newArr[x][y].name == "兵" && leftID == 1 && left.getAttribute("class") !== "pice") {
+                        moveButtonLeft.style.display = display;
+                    }
+                    if (newArr[x][y].name == "卒" && leftID == 2 && left.getAttribute("class") !== "pice") {
+                        moveButtonLeft.style.display = display;
+                    }
+                    if (
+                        left.getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== leftID % 2 &&
+                        newArr[x][y].level >= newArr[x][y - 1].level
+                    ) {
+                        moveButtonLeft.style.display = display;
+                        console.log(newArr[x][y - 1].name); //左
+                    }
+                    if (newArr[x][y].id == 1 && newArr[x][y - 1].name == '兵') {
+                        moveButtonLeft.style.display = "none";
+                    }
+                    if (newArr[x][y].id == 2 && newArr[x][y - 1].name == '卒') {
+                        moveButtonLeft.style.display = "none";
+                    }
+                }
+
+                if (newArr[x][y + 1].eat == true && newArr[x][y].name == '炮') { //右
+                    moveButtonRight.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y + 1; i <= 7; i++) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y + 1].eat == true && newArr[x][y].name == '砲') {
+                    moveButtonRight.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y + 1; i <= 7; i++) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y + 1].eat == true) {
+                    //右
+                    moveButtonRight.style.display = display;
+                    console.log(newArr[x][y + 1].name); //右
+                } else if (newArr[x][y].name == '炮') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y + 1; i <= 7; i++) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y].name == '砲') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y + 1; i <= 7; i++) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else {
+                    if (newArr[x][y].name == "兵" && rightID == 1 && right.getAttribute("class") !== "pice") {
+                        moveButtonRight.style.display = display;
+                    }
+                    if (newArr[x][y].name == "卒" && rightID == 2 && right.getAttribute("class") !== "pice") {
+                        moveButtonRight.style.display = display;
+                    }
+                    if (
+                        right.getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== rightID % 2 &&
+                        newArr[x][y].level >= newArr[x][y + 1].level
+                    ) {
+                        moveButtonRight.style.display = display;
+                        console.log(newArr[x][y + 1].name); //右
+                    }
+                    if (newArr[x][y].id == 1 && newArr[x][y + 1].name == '兵') {
+                        moveButtonRight.style.display = "none";
+                    }
+                    if (newArr[x][y].id == 2 && newArr[x][y + 1].name == '卒') {
+                        moveButtonRight.style.display = "none";
+                    }
+                }
+                point = id;
+            } else if (y == 0) {
+                //最左邊
+                let rightID = newArr[x][y + 1].id;
+                let topID = newArr[x - 1][y].id;
+                let bottomID = newArr[x + 1][y].id;
+
+                console.log("可以吃的棋");
+
+                let top = document.querySelector("#p" + topID + ">div");
+                let bottom = document.querySelector("#p" + bottomID + ">div");
+                let right = document.querySelector("#p" + rightID + ">div");
+
+                let moveButtonRight = document.querySelector(
+                    "#p" + rightID + ">button"
+                );
+                let moveButtonTop = document.querySelector("#p" + topID + ">button");
+                let moveButtonBottom = document.querySelector(
+                    "#p" + bottomID + ">button"
+                );
+
+                if (newArr[x - 1][y].eat == true && newArr[x][y].name == '炮') { //上
+                    moveButtonTop.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x - 1; i >= 0; i--) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x - 1][y].eat == true && newArr[x][y].name == '砲') {
+                    moveButtonTop.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x - 1; i >= 0; i--) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x - 1][y].eat == true) {
+                    //上
+                    moveButtonTop.style.display = display;
+                    console.log(newArr[x - 1][y].name); //上
+                } else if (newArr[x][y].name == '炮') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x - 1; i >= 0; i--) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y].name == '砲') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x - 1; i >= 0; i--) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else {
+                    if (newArr[x][y].name == "兵" && topID == 1 && top.getAttribute("class") !== "pice") {
+                        moveButtonTop.style.display = display;
+                    }
+                    if (newArr[x][y].name == "卒" && topID == 2 && top.getAttribute("class") !== "pice") {
+                        moveButtonTop.style.display = display;
+                    }
+                    if (
+                        top.getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== topID % 2 &&
+                        newArr[x][y].level >= newArr[x - 1][y].level
+                    ) {
+                        moveButtonTop.style.display = display;
+                        console.log(newArr[x - 1][y].name); //上
+                    }
+                    if (newArr[x][y].id == 1 && newArr[x - 1][y].name == '兵') {
+                        moveButtonTop.style.display = "none";
+                    }
+                    if (newArr[x][y].id == 2 && newArr[x - 1][y].name == '卒') {
+                        moveButtonTop.style.display = "none";
+                    }
+                }
+
+
+                if (newArr[x + 1][y].eat == true && newArr[x][y].name == '炮') { //下
+                    moveButtonBottom.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x + 1; i <= 3; i++) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x + 1][y].eat == true && newArr[x][y].name == '砲') {
+                    moveButtonBottom.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x + 1; i <= 3; i++) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x + 1][y].eat == true) {
+                    //下
+                    moveButtonBottom.style.display = display;
+                    console.log(newArr[x + 1][y].name); //下
+                } else if (newArr[x][y].name == '炮') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x + 1; i <= 3; i++) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y].name == '砲') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x + 1; i <= 3; i++) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else {
+                    if (newArr[x][y].name == "兵" && bottomID == 1 && bottom.getAttribute("class") !== "pice") {
+                        moveButtonBottom.style.display = display;
+                    }
+                    if (newArr[x][y].name == "卒" && bottomID == 2 && bottom.getAttribute("class") !== "pice") {
+                        moveButtonBottom.style.display = display;
+                    }
+                    if (
+                        bottom.getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== bottomID % 2 &&
+                        newArr[x][y].level >= newArr[x + 1][y].level
+                    ) {
+                        moveButtonBottom.style.display = display;
+                        console.log(newArr[x + 1][y].name); //下
+                    }
+                    if (newArr[x][y].id == 1 && newArr[x + 1][y].name == '兵') {
+                        moveButtonBottom.style.display = "none";
+                    }
+                    if (newArr[x][y].id == 2 && newArr[x + 1][y].name == '卒') {
+                        moveButtonBottom.style.display = "none";
+                    }
+                }
+
+
+                if (newArr[x][y + 1].eat == true && newArr[x][y].name == '炮') { //右
+                    moveButtonRight.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y + 1; i <= 7; i++) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y + 1].eat == true && newArr[x][y].name == '砲') {
+                    moveButtonRight.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y + 1; i <= 7; i++) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y + 1].eat == true) {
+                    //右
+                    moveButtonRight.style.display = display;
+                    console.log(newArr[x][y + 1].name); //右
+                } else if (newArr[x][y].name == '炮') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y + 1; i <= 7; i++) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y].name == '砲') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y + 1; i <= 7; i++) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else {
+                    if (newArr[x][y].name == "兵" && rightID == 1 && right.getAttribute("class") !== "pice") {
+                        moveButtonRight.style.display = display;
+                    }
+                    if (newArr[x][y].name == "卒" && rightID == 2 && right.getAttribute("class") !== "pice") {
+                        moveButtonRight.style.display = display;
+                    }
+                    if (
+                        right.getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== rightID % 2 &&
+                        newArr[x][y].level >= newArr[x][y + 1].level
+                    ) {
+                        moveButtonRight.style.display = display;
+                        console.log(newArr[x][y + 1].name); //右
+                    }
+                    if (newArr[x][y].id == 1 && newArr[x][y + 1].name == '兵') {
+                        moveButtonRight.style.display = "none";
+                    }
+                    if (newArr[x][y].id == 2 && newArr[x][y + 1].name == '卒') {
+                        moveButtonRight.style.display = "none";
+                    }
+                }
+
+                point = id;
+            } else if (y == 7) {
+                //最右邊
+                let leftID = newArr[x][y - 1].id;
+                let topID = newArr[x - 1][y].id;
+                let bottomID = newArr[x + 1][y].id;
+
+                console.log("可以吃的棋");
+
+                let top = document.querySelector("#p" + topID + ">div");
+                let bottom = document.querySelector("#p" + bottomID + ">div");
+                let left = document.querySelector("#p" + leftID + ">div");
+
+                let moveButtonLeft = document.querySelector(
+                    "#p" + leftID + ">button"
+                );
+                let moveButtonTop = document.querySelector("#p" + topID + ">button");
+                let moveButtonBottom = document.querySelector(
+                    "#p" + bottomID + ">button"
+                );
+
+                if (newArr[x - 1][y].eat == true && newArr[x][y].name == '炮') { //上
+                    moveButtonTop.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x - 1; i >= 0; i--) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x - 1][y].eat == true && newArr[x][y].name == '砲') {
+                    moveButtonTop.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x - 1; i >= 0; i--) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x - 1][y].eat == true) {
+                    //上
+                    moveButtonTop.style.display = display;
+                    console.log(newArr[x - 1][y].name); //上
+                } else if (newArr[x][y].name == '炮') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x - 1; i >= 0; i--) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y].name == '砲') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x - 1; i >= 0; i--) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else {
+                    if (newArr[x][y].name == "兵" && topID == 1 && top.getAttribute("class") !== "pice") {
+                        moveButtonTop.style.display = display;
+                    }
+                    if (newArr[x][y].name == "卒" && topID == 2 && top.getAttribute("class") !== "pice") {
+                        moveButtonTop.style.display = display;
+                    }
+                    if (
+                        top.getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== topID % 2 &&
+                        newArr[x][y].level >= newArr[x - 1][y].level
+                    ) {
+                        moveButtonTop.style.display = display;
+                        console.log(newArr[x - 1][y].name); //上
+                    }
+                    if (newArr[x][y].id == 1 && newArr[x - 1][y].name == '兵') {
+                        moveButtonTop.style.display = "none";
+                    }
+                    if (newArr[x][y].id == 2 && newArr[x - 1][y].name == '卒') {
+                        moveButtonTop.style.display = "none";
+                    }
+                }
+
+
+                if (newArr[x + 1][y].eat == true && newArr[x][y].name == '炮') { //下
+                    moveButtonBottom.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x + 1; i <= 3; i++) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x + 1][y].eat == true && newArr[x][y].name == '砲') {
+                    moveButtonBottom.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x + 1; i <= 3; i++) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x + 1][y].eat == true) {
+                    //下
+                    moveButtonBottom.style.display = display;
+                    console.log(newArr[x + 1][y].name); //下
+                } else if (newArr[x][y].name == '炮') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x + 1; i <= 3; i++) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y].name == '砲') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x + 1; i <= 3; i++) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else {
+                    if (newArr[x][y].name == "兵" && bottomID == 1 && bottom.getAttribute("class") !== "pice") {
+                        moveButtonBottom.style.display = display;
+                    }
+                    if (newArr[x][y].name == "卒" && bottomID == 2 && bottom.getAttribute("class") !== "pice") {
+                        moveButtonBottom.style.display = display;
+                    }
+                    if (
+                        bottom.getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== bottomID % 2 &&
+                        newArr[x][y].level >= newArr[x + 1][y].level
+                    ) {
+                        moveButtonBottom.style.display = display;
+                        console.log(newArr[x + 1][y].name); //下
+                    }
+                    if (newArr[x][y].id == 1 && newArr[x + 1][y].name == '兵') {
+                        moveButtonBottom.style.display = "none";
+                    }
+                    if (newArr[x][y].id == 2 && newArr[x + 1][y].name == '卒') {
+                        moveButtonBottom.style.display = "none";
+                    }
+                }
+                if (newArr[x][y - 1].eat == true && newArr[x][y].name == '炮') { //左
+                    moveButtonLeft.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y - 1; i >= 0; i--) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y - 1].eat == true && newArr[x][y].name == '砲') {
+                    moveButtonLeft.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y - 1; i >= 0; i--) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y - 1].eat == true) {
+                    //左
+                    moveButtonLeft.style.display = display;
+                    console.log(newArr[x][y - 1].name); //左
+                } else if (newArr[x][y].name == '炮') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y - 1; i >= 0; i--) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y].name == '砲') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y - 1; i >= 0; i--) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else {
+                    if (newArr[x][y].name == "兵" && leftID == 1 && left.getAttribute("class") !== "pice") {
+                        moveButtonLeft.style.display = display;
+                    }
+                    if (newArr[x][y].name == "卒" && leftID == 2 && left.getAttribute("class") !== "pice") {
+                        moveButtonLeft.style.display = display;
+                    }
+                    if (
+                        left.getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== leftID % 2 &&
+                        newArr[x][y].level >= newArr[x][y - 1].level
+                    ) {
+                        moveButtonLeft.style.display = display;
+                        console.log(newArr[x][y - 1].name); //左
+                    }
+                    if (newArr[x][y].id == 1 && newArr[x][y - 1].name == '兵') {
+                        moveButtonLeft.style.display = "none";
+                    }
+                    if (newArr[x][y].id == 2 && newArr[x][y - 1].name == '卒') {
+                        moveButtonLeft.style.display = "none";
+                    }
+                }
+                point = id;
+            } else {
+                let rightID = newArr[x][y + 1].id;
+                let leftID = newArr[x][y - 1].id;
+                let topID = newArr[x - 1][y].id;
+                let bottomID = newArr[x + 1][y].id;
+
+                console.log("可以吃的棋");
+
+                let top = document.querySelector("#p" + topID + ">div");
+                let bottom = document.querySelector("#p" + bottomID + ">div");
+                let right = document.querySelector("#p" + rightID + ">div");
+                let left = document.querySelector("#p" + leftID + ">div");
+
+                let moveButtonRight = document.querySelector(
+                    "#p" + rightID + ">button"
+                );
+                let moveButtonLeft = document.querySelector(
+                    "#p" + leftID + ">button"
+                );
+                let moveButtonTop = document.querySelector("#p" + topID + ">button");
+                let moveButtonBottom = document.querySelector(
+                    "#p" + bottomID + ">button"
+                );
+
+
+                if (newArr[x - 1][y].eat == true && newArr[x][y].name == '炮') { //上
+                    moveButtonTop.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x - 1; i >= 0; i--) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x - 1][y].eat == true && newArr[x][y].name == '砲') {
+                    moveButtonTop.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x - 1; i >= 0; i--) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x - 1][y].eat == true) {
+                    //上
+                    moveButtonTop.style.display = display;
+                    console.log(newArr[x - 1][y].name); //上
+                } else if (newArr[x][y].name == '炮') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x - 1; i >= 0; i--) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y].name == '砲') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x - 1; i >= 0; i--) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else {
+                    if (newArr[x][y].name == "兵" && topID == 1 && top.getAttribute("class") !== "pice") {
+                        moveButtonTop.style.display = display;
+                    }
+                    if (newArr[x][y].name == "卒" && topID == 2 && top.getAttribute("class") !== "pice") {
+                        moveButtonTop.style.display = display;
+                    }
+                    if (
+                        top.getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== topID % 2 &&
+                        newArr[x][y].level >= newArr[x - 1][y].level
+                    ) {
+                        moveButtonTop.style.display = display;
+                        console.log(newArr[x - 1][y].name); //上
+                    }
+                    if (newArr[x][y].id == 1 && newArr[x - 1][y].name == '兵') {
+                        moveButtonTop.style.display = "none";
+                    }
+                    if (newArr[x][y].id == 2 && newArr[x - 1][y].name == '卒') {
+                        moveButtonTop.style.display = "none";
+                    }
+                }
+
+
+                if (newArr[x + 1][y].eat == true && newArr[x][y].name == '炮') { //下
+                    moveButtonBottom.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x + 1; i <= 3; i++) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x + 1][y].eat == true && newArr[x][y].name == '砲') {
+                    moveButtonBottom.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x + 1; i <= 3; i++) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x + 1][y].eat == true) {
+                    //下
+                    moveButtonBottom.style.display = display;
+                    console.log(newArr[x + 1][y].name); //下
+                } else if (newArr[x][y].name == '炮') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x + 1; i <= 3; i++) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y].name == '砲') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = x + 1; i <= 3; i++) {
+                        if (newArr[i][y].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[gunEat][y].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[gunEat][y].id % 2) {
+                        document.querySelector("#p" + newArr[gunEat][y].id + ">button").style.display = display;
+                    }
+                } else {
+                    if (newArr[x][y].name == "兵" && bottomID == 1 && bottom.getAttribute("class") !== "pice") {
+                        moveButtonBottom.style.display = display;
+                    }
+                    if (newArr[x][y].name == "卒" && bottomID == 2 && bottom.getAttribute("class") !== "pice") {
+                        moveButtonBottom.style.display = display;
+                    }
+                    if (
+                        bottom.getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== bottomID % 2 &&
+                        newArr[x][y].level >= newArr[x + 1][y].level
+                    ) {
+                        moveButtonBottom.style.display = display;
+                        console.log(newArr[x + 1][y].name); //下
+                    }
+                    if (newArr[x][y].id == 1 && newArr[x + 1][y].name == '兵') {
+                        moveButtonBottom.style.display = "none";
+                    }
+                    if (newArr[x][y].id == 2 && newArr[x + 1][y].name == '卒') {
+                        moveButtonBottom.style.display = "none";
+                    }
+                }
+
+                if (newArr[x][y - 1].eat == true && newArr[x][y].name == '炮') { //左
+                    moveButtonLeft.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y - 1; i >= 0; i--) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y - 1].eat == true && newArr[x][y].name == '砲') {
+                    moveButtonLeft.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y - 1; i >= 0; i--) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y - 1].eat == true) {
+                    //左
+                    moveButtonLeft.style.display = display;
+                    console.log(newArr[x][y - 1].name); //左
+                } else if (newArr[x][y].name == '炮') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y - 1; i >= 0; i--) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y].name == '砲') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y - 1; i >= 0; i--) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else {
+                    if (newArr[x][y].name == "兵" && leftID == 1 && left.getAttribute("class") !== "pice") {
+                        moveButtonLeft.style.display = display;
+                    }
+                    if (newArr[x][y].name == "卒" && leftID == 2 && left.getAttribute("class") !== "pice") {
+                        moveButtonLeft.style.display = display;
+                    }
+                    if (
+                        left.getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== leftID % 2 &&
+                        newArr[x][y].level >= newArr[x][y - 1].level
+                    ) {
+                        moveButtonLeft.style.display = display;
+                        console.log(newArr[x][y - 1].name); //左
+                    }
+                    if (newArr[x][y].id == 1 && newArr[x][y - 1].name == '兵') {
+                        moveButtonLeft.style.display = "none";
+                    }
+                    if (newArr[x][y].id == 2 && newArr[x][y - 1].name == '卒') {
+                        moveButtonLeft.style.display = "none";
+                    }
+                }
+
+
+                if (newArr[x][y + 1].eat == true && newArr[x][y].name == '炮') { //右
+                    moveButtonRight.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y + 1; i <= 7; i++) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y + 1].eat == true && newArr[x][y].name == '砲') {
+                    moveButtonRight.style.display = display;
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y + 1; i <= 7; i++) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y + 1].eat == true) {
+                    //右
+                    moveButtonRight.style.display = display;
+                    console.log(newArr[x][y + 1].name); //右
+                } else if (newArr[x][y].name == '炮') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y + 1; i <= 7; i++) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else if (newArr[x][y].name == '砲') {
+                    let count = 0;
+                    let gunEat;
+                    let ifEat = false;
+                    for (let i = y + 1; i <= 7; i++) {
+                        if (newArr[x][i].eat == false) {
+                            count++
+                            if (count == 2) {
+                                gunEat = i
+                                ifEat = true
+                            }
+                        }
+                    }
+                    if (ifEat && document.querySelector("#p" + newArr[x][gunEat].id + ">div").getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== newArr[x][gunEat].id % 2) {
+                        document.querySelector("#p" + newArr[x][gunEat].id + ">button").style.display = display;
+                    }
+                } else {
+                    if (newArr[x][y].name == "兵" && rightID == 1 && right.getAttribute("class") !== "pice") {
+                        moveButtonRight.style.display = display;
+                    }
+                    if (newArr[x][y].name == "卒" && rightID == 2 && right.getAttribute("class") !== "pice") {
+                        moveButtonRight.style.display = display;
+                    }
+                    if (
+                        right.getAttribute("class") !== "pice" &&
+                        newArr[x][y].id % 2 !== rightID % 2 &&
+                        newArr[x][y].level >= newArr[x][y + 1].level
+                    ) {
+                        moveButtonRight.style.display = display;
+                        console.log(newArr[x][y + 1].name); //右
+                    }
+                    if (newArr[x][y].id == 1 && newArr[x][y + 1].name == '兵') {
+                        moveButtonRight.style.display = "none";
+                    }
+                    if (newArr[x][y].id == 2 && newArr[x][y + 1].name == '卒') {
+                        moveButtonRight.style.display = "none";
+                    }
+                }
+
+                point = id;
+            }
+        }
+
+        function moveCheck(id) {
+            //移動
+            move(point);
+            var Mpoint = piece
+                .map((res) => {
+                    return res.id;
+                })
+                .indexOf(id);
+            let x = Math.floor(Mpoint / 8); //移動後的位置
+            let y = Mpoint % 8;
+
+            var Opoint = piece
+                .map((res) => {
+                    return res.id;
+                })
+                .indexOf(point);
+
+            let Ox = Math.floor(Opoint / 8); //要移動的棋子位置
+            let Oy = Opoint % 8;
+
+            let temp = newArr[Ox][Oy];
+            newArr[Ox][Oy] = newArr[x][y];
+            newArr[x][y] = temp;
+            newArr[Ox][Oy].eat = true;
+
+            let pieceTemp = piece[Opoint];
+            piece[Opoint] = piece[Mpoint];
+            piece[Mpoint] = pieceTemp;
+
+            showCheckerboard();
+            whoWin();
+        }
+
+        function whoWin() {
+            let redCount = 0;
+            let blackCount = 0;
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 8; j++) {
+                    if (newArr[i][j].id % 2 !== 0 && newArr[i][j].eat == true) {
+                        console.log("black");
+                        blackCount++;
+                    } else if (newArr[i][j].id % 2 == 0 && newArr[i][j].eat == true) {
+                        console.log("red");
+                        redCount++;
+                    }
+                }
+            }
+            console.log("blackCount:", blackCount);
+            console.log("redCount", redCount);
+            if (blackCount == 16) {
+                alert("紅方獲勝");
+            } else if (redCount == 16) {
+                alert("黑方獲勝");
+            }
+        }
+    </script>
 </body>
 
 </html>
