@@ -12,17 +12,17 @@ def index():
 
 @app.route('/generate', methods=['POST'])
 def generate():
-    prompt = request.form['prompt']
-    # response = openai.ChatCompletion.create(
-    #     messages=[
-    #         {"role": "user", "content": prompt}
-    #     ],
-    #     model="gpt-4o-mini-2024-07-18",
-    #     temperature = 0.5,
-    # )
-    # generated_text = response['choices'][0]['message']['content'].strip()
+    prompt = request.get_json()['prompt']
+    response = openai.ChatCompletion.create(
+        messages=[
+            {"role": "user", "content": prompt}
+        ],
+        model="gpt-4o-mini-2024-07-18",
+        temperature = 0.5,
+    )
+    generated_text = response['choices'][0]['message']['content'].strip()
     #return render_template('index.html', response=generated_text)
-    #return jsonify({"response": generated_text})
-    return jsonify({"response": prompt})
+    return jsonify({"response": generated_text})
+    # return jsonify({"response": prompt})
 if __name__ == '__main__':
     app.run(debug=True)
