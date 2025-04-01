@@ -21,7 +21,8 @@ def generate():
         temperature = 0.5,
     )
     generated_text = response['choices'][0]['message']['content'].strip()
-    return render_template('index.html', response=generated_text) 
+    #return render_template('index.html', response=generated_text)
+    return jsonify({"response": generated_text})
 
 if __name__ == '__main__':
     app.run(debug=True)
